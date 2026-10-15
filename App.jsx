@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
-import { ArrowDownToLine, ArrowLeft, ArrowRight, BusFront, CalendarDays, Check, ChevronDown, CircleHelp, Clock3, Download, LayoutDashboard, LogOut, Menu, Search, Settings2, ShieldCheck, Users, X } from 'lucide-react-native';
+import { ActivityIndicator, Linking, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { ArrowDownToLine, ArrowLeft, ArrowRight, BusFront, CalendarDays, Check, ChevronDown, CircleHelp, Clock3, Download, LayoutDashboard, Menu, MessageCircle, Search, Settings2, ShieldCheck, Users, X } from 'lucide-react-native';
 import styles from './src/styles';
 
 const initialStaff = [
@@ -57,6 +57,11 @@ export default function App() {
 
   useEffect(() => { let active = true; api(`attendance?date=${todayISO}`).then(data => { if (active && Array.isArray(data.records)) { setStaff(data.records); setConnected(true); } }).catch(() => {}).finally(() => active && setLoading(false)); return () => { active = false; }; }, []);
   const notify = text => { setMessage(text); setTimeout(() => setMessage(''), 3400); };
+  const openWhatsApp = async () => {
+    const message = encodeURIComponent('Hola, necesito ayuda con Rodalia Asistencia.');
+    try { await Linking.openURL(`https://wa.me/?text=${message}`); }
+    catch { notify('No fue posible abrir WhatsApp en este dispositivo.'); }
+  };
   const login = async () => {
     setLoginBusy(true);
     try { const session = await api('auth/login', { method: 'POST', body: { email: loginEmail, password: loginPassword } }); const data = await api(`attendance?date=${todayISO}`, { token: session.token }); setToken(session.token); setStaff(data.records); setConnected(true); setShowLogin(false); setLoginPassword(''); notify('Sesión iniciada correctamente'); }
@@ -98,6 +103,7 @@ export default function App() {
         <View style={styles.bottomNote}><ShieldCheck size={14} color={colors.muted}/><Text style={styles.noteText}>Tu información de personal está protegida y se actualiza de forma segura.</Text><Text style={styles.version}>RODALIA · V1.0</Text></View>
       </ScrollView>
     </View>
+    <Pressable accessibilityRole="button" accessibilityLabel="Abrir WhatsApp" onPress={openWhatsApp} style={({ pressed }) => [styles.whatsappButton, pressed && { opacity: .82, transform: [{ scale: .97 }] }]}><MessageCircle size={20} color="#fff"/><Text style={styles.whatsappLabel}>WhatsApp</Text></Pressable>
     {!!message && <View style={styles.toast}><Check size={16} color={colors.lime}/><Text style={styles.toastText}>{message}</Text></View>}
     {showLogin && <View style={styles.modalShade}><View style={styles.modal}><View style={styles.modalHead}><View><Text style={styles.modalTitle}>Acceso de administración</Text><Text style={styles.modalSub}>Ingresa con las credenciales de tu empresa.</Text></View><IconButton icon={X} label="Cerrar" onPress={() => setShowLogin(false)}/></View><Text style={styles.inputLabel}>CORREO ELECTRÓNICO</Text><TextInput style={styles.modalInput} value={loginEmail} onChangeText={setLoginEmail} placeholder="admin@empresa.mx" placeholderTextColor="#a4a89e" autoCapitalize="none" keyboardType="email-address"/><Text style={styles.inputLabel}>CONTRASEÑA</Text><TextInput style={styles.modalInput} value={loginPassword} onChangeText={setLoginPassword} placeholder="Tu contraseña" placeholderTextColor="#a4a89e" secureTextEntry onSubmitEditing={login}/><View style={styles.modalActions}><Pressable onPress={() => setShowLogin(false)} style={styles.cancelButton}><Text style={styles.cancelLabel}>Cancelar</Text></Pressable><Pressable onPress={login} disabled={loginBusy} style={styles.primaryButton}>{loginBusy ? <ActivityIndicator size="small" color="#fff"/> : <Text style={styles.primaryLabel}>Iniciar sesión</Text>}</Pressable></View></View></View>}
     {showNew && <View style={styles.modalShade}><View style={styles.modal}><View style={styles.modalHead}><View><Text style={styles.modalTitle}>Agregar personal</Text><Text style={styles.modalSub}>Añade a una persona a tu equipo.</Text></View><IconButton icon={X} label="Cerrar" onPress={() => setShowNew(false)}/></View><Text style={styles.inputLabel}>NOMBRE COMPLETO</Text><TextInput style={styles.modalInput} value={newName} onChangeText={setNewName} placeholder="Ej. Ana García López" placeholderTextColor="#a4a89e"/><Text style={styles.inputLabel}>PUESTO</Text><TextInput style={styles.modalInput} value={newRole} onChangeText={setNewRole} placeholder="Ej. Asistente administrativa" placeholderTextColor="#a4a89e"/><View style={styles.modalActions}><Pressable onPress={() => setShowNew(false)} style={styles.cancelButton}><Text style={styles.cancelLabel}>Cancelar</Text></Pressable><Pressable onPress={addPerson} style={styles.primaryButton}><Text style={styles.primaryLabel}>Guardar colaborador</Text></Pressable></View></View></View>}
