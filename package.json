@@ -1,0 +1,25 @@
+{
+  "name": "rodalia-asistencia",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "expo start",
+    "dev": "expo start --web",
+    "build": "expo export --platform web",
+    "preview": "npx serve dist",
+    "db:migrate": "node scripts/migrate.js"
+  },
+  "dependencies": {
+    "expo": "^54.0.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-web": "^0.21.0",
+    "react-native-svg": "15.12.1",
+    "lucide-react-native": "^1.57.0",
+    "pg": "^8.16.3",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {}
+}

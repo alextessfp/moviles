@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Rodalia Asistencia",
+    "slug": "rodalia-asistencia",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "rodalia",
+    "ios": { "supportsTablet": true },
+    "android": { "package": "mx.rodalia.asistencia" },
+    "web": { "bundler": "metro", "output": "single", "name": "Rodalia Asistencia" }
+  }
+}
