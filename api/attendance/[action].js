@@ -1,12 +1,13 @@
 import { applyCors } from '../_lib/cors.js';
 import { getDb } from '../_lib/db.js';
-import { requireAdmin } from '../_lib/auth.js';
+import { requireAuth } from '../_lib/auth.js';
 
 export default async function handler(req, res) {
   if (applyCors(req, res)) return;
   if (req.method !== 'POST' || !['check-in', 'check-out'].includes(req.query.action)) return res.status(405).json({ error: 'Acción no permitida.' });
-  if (!requireAdmin(req, res)) return;
-  const { employeeId } = req.body || {};
+  if (!requireAuth(req, res)) return;
+  const employeeId = req.user.role === 'worker' ? req.user.employeeId : req.body?.employeeId;
+  if (req.user.role === 'worker' && !employeeId) return res.status(403).json({ error: 'La cuenta no está vinculada a un colaborador.' });
   if (!employeeId) return res.status(400).json({ error: 'Falta el identificador del colaborador.' });
   const db = getDb();
   try {
